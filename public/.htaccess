@@ -1,0 +1,18 @@
+# Klasör içeriğinin tarayıcıda listelenmesini engeller.
+Options -Indexes
+
+# Bir klasör adresi açıldığında varsayılan olarak index.php çalıştırılır.
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Gerçek bir dosya varsa doğrudan o dosyanın sunulmasına izin verir.
+    RewriteCond %{REQUEST_FILENAME} !-f
+
+    # Gerçek bir klasör varsa doğrudan o klasöre erişilmesine izin verir.
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Diğer bütün istekleri uygulamanın giriş dosyasına yönlendirir.
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
