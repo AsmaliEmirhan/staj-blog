@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-use RuntimeException;
+use App\Exceptions\HttpException;
 
 /**
  * HTTP metodu ve URL yoluna göre doğru işlemi çalıştırır.
@@ -93,46 +93,67 @@ final class Router
         return $this;
     }
 
-    /**
-     * Gelen isteğe uygun rotayı bulur ve ilgili işlemi çalıştırır.
-     *
-     * @return mixed
-     */
-    public function dispatch(): mixed
-    {
-        $requestMethod = $this->request->method();
-        $requestPath = $this->removeBasePath($this->request->path());
+   /**
+ * Gelen isteğe uygun rotayı bulur ve ilgili işlemi çalıştırır.
+ *
+ * @return mixed
+ */
+public function dispatch(): mixed
+{
+    $requestMethod = $this->request->method();
+    $requestPath = $this->removeBasePath($this->request->path());
+    $allowedMethods = [];
 
-        foreach ($this->routes as $route) {
-            if ($route['method'] !== $requestMethod) {
-                continue;
-            }
+    foreach ($this->routes as $route) {
+        $matches = [];
 
-            $matches = [];
-
-            if (preg_match($route['pattern'], $requestPath, $matches) !== 1) {
-                continue;
-            }
-
-            $routeParameters = $this->extractRouteParameters($matches);
-
-            return call_user_func(
-                $route['handler'],
-                $this->request,
-                $routeParameters
-            );
+        // Önce URL yolunun rota deseniyle eşleşip eşleşmediğini kontrol eder.
+        if (preg_match($route['pattern'], $requestPath, $matches) !== 1) {
+            continue;
         }
 
-        throw new RuntimeException(
-            sprintf(
-                'Rota bulunamadı: %s %s',
-                $requestMethod,
-                $requestPath
-            ),
-            404
+        // URL eşleştiği hâlde HTTP metodu farklıysa izin verilen metodu saklar.
+        if ($route['method'] !== $requestMethod) {
+            $allowedMethods[] = $route['method'];
+
+            continue;
+        }
+
+        $routeParameters = $this->extractRouteParameters($matches);
+
+        return call_user_func(
+            $route['handler'],
+            $this->request,
+            $routeParameters
         );
     }
 
+    // URL mevcut ancak HTTP metodu yanlışsa 405 hatası oluşturur.
+    if ($allowedMethods !== []) {
+        $allowedMethods = array_values(array_unique($allowedMethods));
+        sort($allowedMethods);
+
+        throw new HttpException(
+            statusCode: 405,
+            message: sprintf(
+                'Bu rota için %s metoduna izin verilmiyor.',
+                $requestMethod
+            ),
+            headers: [
+                'Allow' => implode(', ', $allowedMethods),
+            ]
+        );
+    }
+
+    // Hiçbir URL deseni eşleşmediyse 404 hatası oluşturur.
+    throw new HttpException(
+        statusCode: 404,
+        message: sprintf(
+            'İstenen rota bulunamadı: %s',
+            $requestPath
+        )
+    );
+}
     /**
      * Dinamik rota alanlarını düzenli ifade desenine dönüştürür.
      *

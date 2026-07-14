@@ -6,6 +6,8 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Core\Router;
 
+
+
 // Composer, ortam değişkenleri ve uygulama ayarlarını yükler.
 require_once dirname(__DIR__) . '/bootstrap/app.php';
 
@@ -77,5 +79,5 @@ $router->get(
     }
 );
 
-// Gelen isteğe uygun rotayı çalıştırır.
+// Hata oluşursa merkezi ErrorHandler tarafından yakalanır.
 $router->dispatch();

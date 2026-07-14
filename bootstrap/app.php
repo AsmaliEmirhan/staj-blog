@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Dotenv\Dotenv;
+use App\Core\ErrorHandler;
+
 
 // Projenin ana klasör yolunu belirler.
 $rootPath = dirname(__DIR__);
@@ -59,6 +61,7 @@ $dotenv->required('AI_DAILY_LIMIT')->isInteger();
 
 // PHP'nin tarih ve saat işlemlerinde kullanacağı zaman dilimini ayarlar.
 date_default_timezone_set($_ENV['APP_TIMEZONE']);
-
+// PHP hatalarını ve exception'ları merkezi olarak yönetecek sistemi başlatır.
+ErrorHandler::register($rootPath);
 // Başlangıç dosyasını çağıran kodun proje ana yoluna erişmesini sağlar.
 return $rootPath;
