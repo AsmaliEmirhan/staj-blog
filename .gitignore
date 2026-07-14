@@ -1,0 +1,111 @@
+# ==========================================================
+# ORTAM DEĞİŞKENLERİ
+# ==========================================================
+
+# Gerçek ortam dosyaları parola ve API anahtarı içerebilir.
+.env
+.env.*
+
+# Örnek ortam dosyası GitHub'a gönderilir.
+!.env.example
+
+
+# ==========================================================
+# PHP VE COMPOSER
+# ==========================================================
+
+# Composer tarafından indirilen PHP paketleri yeniden kurulabilir.
+vendor/
+
+# Composer'a ait kişisel kimlik doğrulama bilgileri takip edilmez.
+auth.json
+
+# PHPUnit tarafından oluşturulan geçici dosyalar takip edilmez.
+.phpunit.cache/
+.phpunit.result.cache
+coverage/
+
+
+# ==========================================================
+# NODE.JS, VITE VE REACT
+# ==========================================================
+
+# npm tarafından indirilen paketler GitHub'a gönderilmez.
+node_modules/
+
+# Vite tarafından oluşturulan üretim dosyaları yeniden üretilebilir.
+public/build/
+
+# Vite önbelleği takip edilmez.
+.vite/
+
+# npm tarafından oluşturulabilecek hata kayıtları takip edilmez.
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# ==========================================================
+# UYGULAMA TARAFINDAN OLUŞTURULAN DOSYALAR
+# ==========================================================
+
+# Uygulama logları GitHub'a gönderilmez.
+storage/logs/*
+*.log
+
+# Log klasörünün kendisini takip edebilmek için izin verilir.
+!storage/logs/.gitkeep
+
+# Önbellek dosyaları çalışma sırasında yeniden oluşturulur.
+storage/cache/*
+
+# Cache klasörünün kendisini takip edebilmek için izin verilir.
+!storage/cache/.gitkeep
+
+# Kullanıcıların yüklediği kapak görselleri GitHub'a gönderilmez.
+public/uploads/*
+
+# Upload klasörünün kendisini takip edebilmek için izin verilir.
+!public/uploads/.gitkeep
+
+
+# ==========================================================
+# INKVOICE TEMA KAYNAKLARI
+# ==========================================================
+
+# Orijinal tema arşivleri proje repository'sine eklenmez.
+*.zip
+
+# Orijinal ve işlenmemiş tema kaynakları takip edilmez.
+theme-source/
+theme-reference/
+
+# Projeye seçilerek aktarılan public/assets dosyaları takip edilecektir.
+
+
+# ==========================================================
+# EDİTÖ VE İŞLETİM SİSTEMİ DOSYALARI
+# ==========================================================
+
+# Kişisel editör ayarları takip edilmez.
+.vscode/
+.idea/
+
+# Windows tarafından oluşturulan sistem dosyaları takip edilmez.
+Thumbs.db
+Desktop.ini
+
+# macOS tarafından oluşturulan sistem dosyaları takip edilmez.
+.DS_Store
+
+
+# ==========================================================
+# GEÇİCİ DOSYALAR
+# ==========================================================
+
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
