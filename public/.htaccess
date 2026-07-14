@@ -1,18 +1,25 @@
-# Klasör içeriğinin tarayıcıda listelenmesini engeller.
-Options -Indexes
-
-# Bir klasör adresi açıldığında varsayılan olarak index.php çalıştırılır.
-DirectoryIndex index.php
-
 <IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
     RewriteEngine On
 
-    # Gerçek bir dosya varsa doğrudan o dosyanın sunulmasına izin verir.
-    RewriteCond %{REQUEST_FILENAME} !-f
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Gerçek bir klasör varsa doğrudan o klasöre erişilmesine izin verir.
+    # Handle X-XSRF-Token Header
+    RewriteCond %{HTTP:x-xsrf-token} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+
+    # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
 
-    # Diğer bütün istekleri uygulamanın giriş dosyasına yönlendirir.
-    RewriteRule ^ index.php [QSA,L]
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
 </IfModule>

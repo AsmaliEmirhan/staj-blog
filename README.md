@@ -1,148 +1,58 @@
-# Staj Blog
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-Staj Blog; kullanıcıların blog yazıları oluşturabildiği, düzenleyebildiği ve yayımlayabildiği yapay zekâ destekli bir blog platformudur.
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-Proje, bir aylık yazılım stajı kapsamında güvenli yazılım geliştirme, nesne yönelimli programlama ve temiz kod ilkeleri dikkate alınarak geliştirilmektedir.
+## About Laravel
 
-## Projenin Durumu
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-Proje aktif geliştirme aşamasındadır.
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Geliştirme ortamı, Git repository'si ve temel proje yapılandırmaları hazırlanmıştır. PHP uygulama mimarisi, veritabanı, blog sistemi ve kullanıcı işlemleri sırayla geliştirilecektir.
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Projenin Temel Özellikleri
+## Learning Laravel
 
-- Kullanıcı kayıt, giriş ve çıkış sistemi
-- Güvenli oturum yönetimi
-- Blog yazısı oluşturma, düzenleme ve silme
-- Taslak ve yayımlanmış yazı sistemi
-- Kategori ve etiket yönetimi
-- Blog yazılarında arama ve filtreleme
-- Sayfalama
-- Güvenli kapak görseli yükleme
-- Yapay zekâ ile blog taslağı oluşturma
-- Kullanıcı paneli
-- Temel yönetici yetkilendirmesi
-- Responsive kullanıcı arayüzü
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-## Kullanılan Mimari
+In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-Proje, klasik PHP uygulaması ile izole React bileşenlerini bir arada kullanan bütünleşik bir mimariye sahiptir.
+You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
 
-### Genel kullanıcı arayüzü
+## Agentic Development
 
-Sitenin genel tasarımında kurum tarafından sağlanan InkVoice XHTML teması kullanılacaktır.
+Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
 
-Ana sayfa, blog detayları, kategoriler, kullanıcı formları ve ortak sayfa düzenleri aşağıdaki teknolojilerle hazırlanacaktır:
+```bash
+composer require laravel/boost --dev
 
-- HTML5
-- PHP view dosyaları
-- Bootstrap 5
-- jQuery
-- InkVoice tema CSS ve JavaScript dosyaları
+php artisan boost:install
+```
 
-### Back-end
+Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
 
-Back-end tarafı PHP ile nesne yönelimli ve katmanlı bir yapıda geliştirilecektir.
+## Contributing
 
-Temel back-end katmanları:
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-- Controller
-- Service
-- Repository
-- Model
-- Middleware
-- Validation
-- REST API
+## Code of Conduct
 
-### React kullanımı
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-React bütün siteyi yönetmeyecektir.
+## Security Vulnerabilities
 
-React, kullanıcı etkileşiminin ve form durumunun daha yoğun olduğu AI Writer bölümünde izole bir bileşen olarak kullanılacaktır. React yalnızca kendisine ayrılan HTML alanını yönetecek, jQuery ise bu alana müdahale etmeyecektir.
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-Bu yaklaşım sayesinde InkVoice temasının mevcut tasarımı korunurken, yapay zekâ özelliği modern ve yönetilebilir bir kullanıcı deneyimine sahip olacaktır.
+## License
 
-## Yapay Zekâ Özelliği
-
-Kullanıcı aşağıdaki bilgileri girerek yapay zekâ destekli blog taslağı oluşturabilecektir:
-
-- Anahtar kelimeler
-- Yazı tonu
-- Hedef içerik uzunluğu
-- Kategori tercihi
-
-Yapay zekâ aşağıdaki içerikleri önerecektir:
-
-- Blog başlığı
-- Kısa özet
-- Blog içeriği
-- Etiketler
-
-Yapay zekâ tarafından oluşturulan içerik doğrudan yayımlanmayacaktır. Kullanıcı içeriği kontrol edip düzenledikten sonra taslak olarak kaydedebilecek veya yayımlayabilecektir.
-
-## Kullanılan Teknolojiler
-
-### Sunucu tarafı
-
-- PHP 8.3
-- MySQL 8.4
-- PDO
-- Composer
-- REST API
-- PHP Session
-
-### Kullanıcı arayüzü
-
-- InkVoice XHTML
-- Bootstrap 5.3
-- jQuery 3.7
-- SCSS/CSS
-- Swiper
-- React
-- Vite
-
-### Geliştirme araçları
-
-- Laragon
-- Apache
-- Visual Studio Code
-- Git
-- GitHub
-- Postman veya Bruno
-- PHPUnit
-
-## Güvenlik Yaklaşımı
-
-Projede aşağıdaki güvenlik önlemleri uygulanacaktır:
-
-- Parolaların `password_hash()` ile saklanması
-- Parola kontrolünde `password_verify()` kullanılması
-- PDO prepared statements kullanılması
-- Kullanıcı girdilerinin doğrulanması
-- Yetkilendirme ve yazı sahipliği kontrolleri
-- CSRF koruması
-- Güvenli session ayarları
-- Giriş ve AI isteklerinde rate limiting
-- Güvenli dosya yükleme kontrolleri
-- Ortam değişkenleriyle gizli bilgi yönetimi
-- Kullanıcıya hassas sunucu hatalarının gösterilmemesi
-
-Gerçek parolalar, veritabanı bilgileri ve AI API anahtarları GitHub repository'sine gönderilmeyecektir.
-
-## Proje Klasör Yapısı
-
-```text
-staj-blog/
-├── app/
-├── bootstrap/
-├── database/
-├── docs/
-├── public/
-├── resources/
-├── routes/
-├── storage/
-├── tests/
-├── .editorconfig
-├── .gitignore
-└── README.md
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

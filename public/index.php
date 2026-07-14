@@ -1,83 +1,20 @@
 <?php
 
-declare(strict_types=1);
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 
-use App\Core\Request;
-use App\Core\Response;
-use App\Core\Router;
+define('LARAVEL_START', microtime(true));
 
-
-
-// Composer, ortam değişkenleri ve uygulama ayarlarını yükler.
-require_once dirname(__DIR__) . '/bootstrap/app.php';
-
-// Tarayıcıdan gelen isteği yakalar.
-$request = Request::capture();
-
-// public/index.php dosyasının sunucudaki temel URL yolunu belirler.
-// Localhost kullanımında sonuç: /staj-blog/public
-$scriptDirectory = dirname($_SERVER['SCRIPT_NAME'] ?? '');
-$basePath = str_replace('\\', '/', $scriptDirectory);
-
-if ($basePath === '/' || $basePath === '.') {
-    $basePath = '';
+// Determine if the application is in maintenance mode...
+if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+    require $maintenance;
 }
 
-// Router nesnesini mevcut istek ve temel URL yoluyla oluşturur.
-$router = new Router($request, $basePath);
+// Register the Composer autoloader...
+require __DIR__.'/../vendor/autoload.php';
 
-// Ana test rotası.
-$router->get(
-    '/',
-    static function (Request $request, array $parameters): void {
-        Response::success(
-            message: 'Ana rota başarıyla çalıştı.',
-            data: [
-                'method' => $request->method(),
-                'path' => $request->path(),
-            ]
-        )->send();
-    }
-);
+// Bootstrap Laravel and handle the request...
+/** @var Application $app */
+$app = require_once __DIR__.'/../bootstrap/app.php';
 
-// Query parametresi test rotası.
-$router->get(
-    '/request-test',
-    static function (Request $request, array $parameters): void {
-        Response::success(
-            message: 'GET rotası başarıyla çalıştı.',
-            data: [
-                'query' => $request->query(),
-            ]
-        )->send();
-    }
-);
-
-// JSON body test rotası.
-$router->post(
-    '/request-test',
-    static function (Request $request, array $parameters): void {
-        Response::success(
-            message: 'POST rotası başarıyla çalıştı.',
-            data: [
-                'body' => $request->input(),
-            ]
-        )->send();
-    }
-);
-
-// Dinamik URL parametresi test rotası.
-$router->get(
-    '/posts/{slug}',
-    static function (Request $request, array $parameters): void {
-        Response::success(
-            message: 'Dinamik blog rotası başarıyla çalıştı.',
-            data: [
-                'slug' => $parameters['slug'] ?? null,
-            ]
-        )->send();
-    }
-);
-
-// Hata oluşursa merkezi ErrorHandler tarafından yakalanır.
-$router->dispatch();
+$app->handleRequest(Request::capture());
