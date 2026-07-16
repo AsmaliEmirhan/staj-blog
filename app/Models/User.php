@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -96,6 +97,27 @@ class User extends Authenticatable
     public function moderatedComments(): HasMany
     {
         return $this->hasMany(Comment::class, 'moderated_by');
+    }
+
+    /**
+     * Kullanıcının oluşturduğu beğeni kayıtlarını döndürür.
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    /**
+     * Kullanıcının beğendiği blog yazılarını döndürür.
+     */
+    public function likedPosts(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Post::class,
+            'likes',
+            'user_id',
+            'post_id'
+        )->withTimestamps();
     }
 
     /**
