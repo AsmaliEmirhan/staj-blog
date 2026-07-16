@@ -83,6 +83,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Kullanıcının yazdığı yorumları döndürür.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * Yöneticinin incelediği yorumları döndürür.
+     */
+    public function moderatedComments(): HasMany
+    {
+        return $this->hasMany(Comment::class, 'moderated_by');
+    }
+
+    /**
      * Kullanıcının yönetici yetkisine sahip olup olmadığını kontrol eder.
      */
     public function isAdmin(): bool

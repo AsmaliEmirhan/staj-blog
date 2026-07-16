@@ -20,7 +20,6 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
-        // Kategori adı ve slug değerinin birbiriyle uyumlu olmasını sağlar.
         $name = fake()->unique()->words(2, true);
 
         return [
