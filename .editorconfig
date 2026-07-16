@@ -1,18 +1,31 @@
+# Bu dosyadan daha üst klasörlerde başka EditorConfig ayarı aranmaz.
 root = true
 
+# Projedeki bütün dosyalar için ortak kurallar.
 [*]
 charset = utf-8
 end_of_line = lf
-indent_size = 4
-indent_style = space
 insert_final_newline = true
+indent_style = space
+indent_size = 4
 trim_trailing_whitespace = true
 
-[*.md]
-trim_trailing_whitespace = false
+# Front-end dosyalarında iki boşluk kullanılır.
+[*.{js,jsx,ts,tsx,css,scss,json}]
+indent_size = 2
 
+# YAML dosyalarında iki boşluk kullanılır.
 [*.{yml,yaml}]
 indent_size = 2
 
-[{compose,docker-compose}.{yml,yaml}]
+# PHP dosyalarında PSR standartlarına uygun dört boşluk kullanılır.
+[*.php]
 indent_size = 4
+
+# SQL dosyalarında okunabilirlik için dört boşluk kullanılır.
+[*.sql]
+indent_size = 4
+
+# Markdown satır sonlarındaki boşluklar biçimlendirme amacıyla kullanılabilir.
+[*.md]
+trim_trailing_whitespace = false
