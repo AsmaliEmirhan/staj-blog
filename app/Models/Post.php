@@ -148,6 +148,27 @@ class Post extends Model
     }
 
     /**
+     * Yazıya ait bookmark kayıtlarını döndürür.
+     */
+    public function bookmarks(): HasMany
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    /**
+     * Yazıyı daha sonra okumak için kaydeden kullanıcıları döndürür.
+     */
+    public function bookmarkedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'bookmarks',
+            'post_id',
+            'user_id'
+        )->withTimestamps();
+    }
+
+    /**
      * Yalnızca yayınlanmış ve yayın zamanı gelmiş yazıları getirir.
      */
     public function scopePublished(Builder $query): Builder

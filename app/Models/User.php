@@ -121,6 +121,27 @@ class User extends Authenticatable
     }
 
     /**
+     * Kullanıcının oluşturduğu bookmark kayıtlarını döndürür.
+     */
+    public function bookmarks(): HasMany
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    /**
+     * Kullanıcının daha sonra okumak için kaydettiği yazıları döndürür.
+     */
+    public function bookmarkedPosts(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Post::class,
+            'bookmarks',
+            'user_id',
+            'post_id'
+        )->withTimestamps();
+    }
+
+    /**
      * Kullanıcının yönetici yetkisine sahip olup olmadığını kontrol eder.
      */
     public function isAdmin(): bool
