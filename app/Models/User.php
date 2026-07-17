@@ -156,4 +156,20 @@ class User extends Authenticatable
     {
         return $this->status === self::STATUS_ACTIVE;
     }
+
+    /**
+     * Kullanıcının oluşturduğu bildirimleri döndürür.
+     */
+    public function reports(): HasMany
+    {
+        return $this->hasMany(Report::class);
+    }
+
+    /**
+     * Kullanıcının yönetici olarak incelediği bildirimleri döndürür.
+     */
+    public function reviewedReports(): HasMany
+    {
+        return $this->hasMany(Report::class, 'reviewed_by');
+    }
 }
