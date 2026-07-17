@@ -149,6 +149,14 @@ class Comment extends Model
     }
 
     /**
+     * Yorumla ilişkili bildirimleri döndürür.
+     */
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(Notification::class, 'subject');
+    }
+
+    /**
      * Yorumu belirtilen yönetici adına reddeder.
      */
     public function reject(User $moderator): bool

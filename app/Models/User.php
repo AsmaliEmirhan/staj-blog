@@ -166,6 +166,25 @@ class User extends Authenticatable
     }
 
     /**
+     * Kullanıcının aldığı uygulama bildirimlerini döndürür.
+     *
+     * Laravel'in yerleşik notifications ilişkisiyle çakışmaması için
+     * özel bir metot adı kullanılır.
+     */
+    public function receivedNotifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    /**
+     * Kullanıcının eylemleriyle oluşan bildirimleri döndürür.
+     */
+    public function triggeredNotifications(): HasMany
+    {
+        return $this->hasMany(Notification::class, 'actor_id');
+    }
+
+    /**
      * Kullanıcının yönetici olarak incelediği bildirimleri döndürür.
      */
     public function reviewedReports(): HasMany

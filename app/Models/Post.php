@@ -205,6 +205,14 @@ class Post extends Model
     }
 
     /**
+     * Yazıyla ilişkili bildirimleri döndürür.
+     */
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(Notification::class, 'subject');
+    }
+
+    /**
      * Rota model bağlamasında ID yerine slug kullanır.
      *
      * Örnek: /yazilar/laravel-ile-blog-gelistirme
