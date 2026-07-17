@@ -213,6 +213,14 @@ class Post extends Model
     }
 
     /**
+     * Yazıyla ilişkili yapay zekâ üretim kayıtlarını döndürür.
+     */
+    public function aiGenerations(): HasMany
+    {
+        return $this->hasMany(AiGeneration::class);
+    }
+
+    /**
      * Rota model bağlamasında ID yerine slug kullanır.
      *
      * Örnek: /yazilar/laravel-ile-blog-gelistirme

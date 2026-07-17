@@ -185,6 +185,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Kullanıcının başlattığı yapay zekâ üretimlerini döndürür.
+     */
+    public function aiGenerations(): HasMany
+    {
+        return $this->hasMany(AiGeneration::class);
+    }
+
+    /**
      * Kullanıcının yönetici olarak incelediği bildirimleri döndürür.
      */
     public function reviewedReports(): HasMany
