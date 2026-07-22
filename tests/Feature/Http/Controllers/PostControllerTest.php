@@ -336,4 +336,83 @@ class PostControllerTest extends TestCase
             $post->tags()->pluck('tags.id')->all(),
         );
     }
+
+    public function test_yazi_aramasi_baslik_ve_icerige_gore_sonuclari_filtreler(): void
+    {
+        $titleMatch = Post::factory()->published()->create([
+            'title' => 'Laravel ile Güvenli Uygulama Geliştirme',
+            'content' => 'Bu yazı güvenli web uygulamalarını açıklamaktadır.',
+        ]);
+
+        $contentMatch = Post::factory()->published()->create([
+            'title' => 'PHP Uygulama Rehberi',
+            'content' => 'Bu içerikte Laravel kullanımı ayrıntılı olarak anlatılmaktadır.',
+        ]);
+
+        $unmatchedPost = Post::factory()->published()->create([
+            'title' => 'Veritabanı Tasarımı',
+            'content' => 'Bu içerikte ilişkisel veritabanları anlatılmaktadır.',
+        ]);
+
+        $response = $this->get(route('posts.index', [
+            'search' => 'Laravel',
+        ]));
+
+        $response
+            ->assertOk()
+            ->assertViewIs('posts.index')
+            ->assertViewHas('search', 'Laravel')
+            ->assertSee($titleMatch->title)
+            ->assertSee($contentMatch->title)
+            ->assertDontSee($unmatchedPost->title);
+    }
+
+    public function test_yazi_sayfalamasinda_arama_parametresi_korunur(): void
+    {
+        foreach (range(1, 11) as $number) {
+            Post::factory()->published()->create([
+                'title' => "Laravel Sayfalama Yazısı {$number}",
+                'published_at' => now()->subMinutes($number),
+            ]);
+        }
+
+        $unmatchedPost = Post::factory()->published()->create([
+            'title' => 'PHP Sayfalama Yazısı',
+            'content' => 'Bu içerik arama sonucuna dahil edilmemelidir.',
+        ]);
+
+        $firstPageResponse = $this->get(route('posts.index', [
+            'search' => 'Laravel',
+        ]));
+
+        $firstPageResponse
+            ->assertOk()
+            ->assertViewHas('posts', function ($posts): bool {
+                $nextPageUrl = $posts->nextPageUrl();
+
+                return $posts->total() === 11
+                    && $posts->count() === 10
+                    && $posts->perPage() === 10
+                    && $posts->currentPage() === 1
+                    && is_string($nextPageUrl)
+                    && str_contains($nextPageUrl, 'search=Laravel')
+                    && str_contains($nextPageUrl, 'page=2');
+            })
+            ->assertDontSee($unmatchedPost->title);
+
+        $secondPageResponse = $this->get(route('posts.index', [
+            'search' => 'Laravel',
+            'page' => 2,
+        ]));
+
+        $secondPageResponse
+            ->assertOk()
+            ->assertViewHas('search', 'Laravel')
+            ->assertViewHas('posts', function ($posts): bool {
+                return $posts->total() === 11
+                    && $posts->count() === 1
+                    && $posts->currentPage() === 2;
+            })
+            ->assertDontSee($unmatchedPost->title);
+    }
 }
