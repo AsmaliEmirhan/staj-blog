@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -246,5 +247,93 @@ class PostControllerTest extends TestCase
         $this->assertDatabaseMissing('posts', [
             'title' => 'Geçersiz Durum Testi',
         ]);
+    }
+
+    public function test_yazi_olusturulurken_secilen_etiketler_kaydedilir(): void
+    {
+        $user = User::factory()->create([
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        $tags = Tag::factory()->count(2)->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->post(route('posts.store'), [
+                'title' => 'Etiketli Test Yazısı',
+                'excerpt' => 'Seçilen etiketlerin kaydedilmesini test ediyoruz.',
+                'content' => 'Bu içerik, yazı oluşturulurken seçilen etiketlerin doğru şekilde kaydedildiğini doğrulayacak uzunluktadır.',
+                'status' => Post::STATUS_DRAFT,
+                'tag_ids' => $tags->modelKeys(),
+            ]);
+
+        $response->assertSessionHasNoErrors();
+
+        $post = Post::query()
+            ->where('title', 'Etiketli Test Yazısı')
+            ->firstOrFail();
+
+        $response->assertRedirect(route('posts.show', $post));
+
+        foreach ($tags as $tag) {
+            $this->assertDatabaseHas('post_tag', [
+                'post_id' => $post->id,
+                'tag_id' => $tag->id,
+            ]);
+        }
+
+        $this->assertEqualsCanonicalizing(
+            $tags->modelKeys(),
+            $post->tags()->pluck('tags.id')->all(),
+        );
+    }
+
+    public function test_yazi_duzenlenirken_etiketler_guncellenir(): void
+    {
+        $user = User::factory()->create([
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        $post = Post::factory()
+            ->for($user, 'author')
+            ->create();
+
+        $oldTag = Tag::factory()->create();
+        $newTags = Tag::factory()->count(2)->create();
+
+        $post->tags()->attach($oldTag->id);
+
+        $response = $this
+            ->actingAs($user)
+            ->put(route('posts.update', $post), [
+                'title' => 'Etiketleri Güncellenen Yazı',
+                'excerpt' => 'Yazının etiketleri düzenleme ekranından güncellendi.',
+                'content' => 'Bu içerik, yazı düzenlenirken eski etiketlerin kaldırılıp yeni etiketlerin kaydedildiğini doğrulamak için hazırlanmıştır.',
+                'status' => Post::STATUS_DRAFT,
+                'tag_ids' => $newTags->modelKeys(),
+            ]);
+
+        $response->assertSessionHasNoErrors();
+
+        $post->refresh();
+
+        $response->assertRedirect(route('posts.show', $post));
+
+        $this->assertDatabaseMissing('post_tag', [
+            'post_id' => $post->id,
+            'tag_id' => $oldTag->id,
+        ]);
+
+        foreach ($newTags as $newTag) {
+            $this->assertDatabaseHas('post_tag', [
+                'post_id' => $post->id,
+                'tag_id' => $newTag->id,
+            ]);
+        }
+
+        $this->assertEqualsCanonicalizing(
+            $newTags->modelKeys(),
+            $post->tags()->pluck('tags.id')->all(),
+        );
     }
 }
