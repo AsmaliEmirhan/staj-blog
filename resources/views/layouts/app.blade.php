@@ -117,6 +117,7 @@
             </a>
 
             <a href="{{ route('posts.index') }}">Yazılar</a>
+            <a href="{{ route('categories.index') }}">Kategoriler</a>
 
             @auth
                 <a href="{{ route('posts.create') }}">Yeni yazı</a>

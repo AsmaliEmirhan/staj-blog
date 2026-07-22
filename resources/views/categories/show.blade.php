@@ -1,19 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Blog Yazıları')
+@section('title', $category->name)
 
 @section('content')
-    <h1>Blog yazıları</h1>
+    <h1>{{ $category->name }}</h1>
 
-    @auth
-        @can('create', App\Models\Post::class)
-            <p>
-                <a class="button" href="{{ route('posts.create') }}">
-                    Yeni yazı oluştur
-                </a>
-            </p>
-        @endcan
-    @endauth
+    @if ($category->description)
+        <p>{{ $category->description }}</p>
+    @endif
 
     @forelse ($posts as $post)
         <article class="post">
@@ -25,14 +19,6 @@
 
             <p>
                 Yazar: {{ $post->author->name }}
-                · Kategori:
-                    @if ($post->category)
-                        <a href="{{ route('categories.show', $post->category) }}">
-                            {{ $post->category->name }}
-                        </a>
-                    @else
-                        Kategorisiz
-                    @endif
                 · Yayın:
                 {{ $post->published_at?->format('d.m.Y H:i') }}
             </p>
@@ -50,11 +36,17 @@
                 </p>
             @endif
 
-            <a href="{{ route('posts.show', $post) }}">Devamını oku</a>
+            <a href="{{ route('posts.show', $post) }}">
+                Devamını oku
+            </a>
         </article>
     @empty
-        <p>Henüz yayınlanmış bir blog yazısı bulunmuyor.</p>
+        <p>Bu kategoride henüz yayımlanmış bir yazı bulunmuyor.</p>
     @endforelse
 
     {{ $posts->links() }}
+
+    <p>
+        <a href="{{ route('posts.index') }}">Tüm yazılara dön</a>
+    </p>
 @endsection

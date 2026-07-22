@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,17 @@ Route::middleware('guest')->group(function (): void {
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| Kategori rotaları
+|--------------------------------------------------------------------------
+*/
+Route::get('/categories', [CategoryController::class, 'index'])
+    ->name('categories.index');
+
+Route::get('/categories/{category}', [CategoryController::class, 'show'])
+    ->name('categories.show');
 
 /*
 |--------------------------------------------------------------------------
