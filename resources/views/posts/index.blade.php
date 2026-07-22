@@ -5,6 +5,26 @@
 @section('content')
     <h1>Blog yazıları</h1>
 
+    <form method="GET" action="{{ route('posts.index') }}">
+        <label for="search">Yazılarda ara</label>
+
+        <input
+            id="search"
+            name="search"
+            type="search"
+            value="{{ $search }}"
+            maxlength="100"
+            placeholder="Başlık veya içerik yazın"
+        >
+
+        <button type="submit">Ara</button>
+
+        @if ($search !== '')
+            <a class="button" href="{{ route('posts.index') }}">Aramayı temizle</a>
+        @endif
+    </form>
+
+
     @auth
         @can('create', App\Models\Post::class)
             <p>

@@ -11,26 +11,38 @@ use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
-    /**
-     * Yayındaki blog yazılarını listeler.
-     */
-    public function index(): View
+    public function index(Request $request): View
     {
         $this->authorize('viewAny', Post::class);
+
+        $validated = $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        $search = trim($validated['search'] ?? '');
 
         $posts = Post::query()
             ->with(['author', 'category', 'tags'])
             ->where('status', Post::STATUS_PUBLISHED)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->where(function ($query) use ($search): void {
+                    $query
+                        ->where('title', 'like', "%{$search}%")
+                        ->orWhere('content', 'like', "%{$search}%");
+                });
+            })
             ->latest('published_at')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('posts.index', compact('posts'));
+        return view('posts.index', compact('posts', 'search'));
     }
 
     /**
