@@ -116,4 +116,69 @@ class TagTest extends TestCase
 
         $this->assertSame('slug', $tag->getRouteKeyName());
     }
+
+    /**
+     * Etiket sayfasında etikete bağlı yayımlanmış yazıyı gösterir.
+     */
+    public function test_tag_page_displays_published_post(): void
+    {
+        $tag = Tag::factory()
+            ->named('Teknoloji')
+            ->create();
+
+        $post = Post::factory()
+            ->published()
+            ->create([
+                'title' => 'Teknoloji Yazısı',
+            ]);
+
+        $post->tags()->attach($tag->id);
+
+        $response = $this->get(route('tags.show', $tag));
+
+        $response
+            ->assertOk()
+            ->assertViewIs('tags.show')
+            ->assertViewHas('tag', $tag)
+            ->assertSee('Teknoloji etiketli yazılar')
+            ->assertSee('Teknoloji Yazısı');
+    }
+
+    /**
+     * Etiket sayfasında taslak yazıları göstermez.
+     */
+    public function test_tag_page_does_not_display_draft_post(): void
+    {
+        $tag = Tag::factory()->create();
+
+        $draftPost = Post::factory()->create([
+            'title' => 'Gizli Taslak Yazı',
+        ]);
+
+        $draftPost->tags()->attach($tag->id);
+
+        $this->get(route('tags.show', $tag))
+            ->assertOk()
+            ->assertDontSee('Gizli Taslak Yazı');
+    }
+
+    /**
+     * Etiket sayfasında yayın tarihi gelmemiş yazıları göstermez.
+     */
+    public function test_tag_page_does_not_display_future_post(): void
+    {
+        $tag = Tag::factory()->create();
+
+        $futurePost = Post::factory()->create([
+            'title' => 'Gelecekteki Yazı',
+            'status' => Post::STATUS_PUBLISHED,
+            'published_at' => now()->addDay(),
+        ]);
+
+        $futurePost->tags()->attach($tag->id);
+
+        $this->get(route('tags.show', $tag))
+            ->assertOk()
+            ->assertDontSee('Gelecekteki Yazı');
+    }
 }

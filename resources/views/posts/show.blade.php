@@ -34,12 +34,17 @@
             {!! nl2br(e($post->content)) !!}
         </div>
 
-        @if ($post->tags->isNotEmpty())
-            <p>
-                <strong>Etiketler:</strong>
-                {{ $post->tags->pluck('name')->join(', ') }}
-            </p>
-        @endif
+            @if ($post->tags->isNotEmpty())
+                <p>
+                    <strong>Etiketler:</strong>
+
+                    @foreach ($post->tags as $tag)
+                        <a href="{{ route('tags.show', $tag) }}">
+                            {{ $tag->name }}
+                        </a>{{ $loop->last ? '' : ',' }}
+                    @endforeach
+                </p>
+            @endif
     </article>
 
     <div class="actions">

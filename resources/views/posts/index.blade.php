@@ -63,10 +63,15 @@
                 <p>{{ Str::limit(strip_tags($post->content), 180) }}</p>
             @endif
 
-            @if ($post->tags->isNotEmpty())
+                    @if ($post->tags->isNotEmpty())
                 <p>
                     Etiketler:
-                    {{ $post->tags->pluck('name')->join(', ') }}
+
+                    @foreach ($post->tags as $tag)
+                        <a href="{{ route('tags.show', $tag) }}">
+                            {{ $tag->name }}
+                        </a>{{ $loop->last ? '' : ',' }}
+                    @endforeach
                 </p>
             @endif
 
