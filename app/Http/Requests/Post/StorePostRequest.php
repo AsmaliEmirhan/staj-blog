@@ -69,6 +69,13 @@ class StorePostRequest extends FormRequest
                 'string',
                 'min:50',
             ],
+            'featured_image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'extensions:jpg,jpeg,png,webp',
+                'max:5120',
+            ],
             'status' => [
                 'required',
                 'string',

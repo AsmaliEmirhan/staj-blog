@@ -8,6 +8,8 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PostControllerTest extends TestCase
@@ -166,6 +168,47 @@ class PostControllerTest extends TestCase
             'status' => Post::STATUS_DRAFT,
             'published_at' => null,
         ]);
+    }
+
+    public function test_yazi_olusturulurken_one_cikan_gorsel_kaydedilir(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create([
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        $image = UploadedFile::fake()
+            ->image('kapak.jpg', 1200, 630)
+            ->size(500);
+
+        $response = $this
+            ->actingAs($user)
+            ->post(route('posts.store'), [
+                'title' => 'Görselli Test Yazısı',
+                'excerpt' => 'Öne çıkan görsel yükleme testi.',
+                'content' => 'Bu içerik, yazı oluşturulurken öne çıkan görselin güvenli biçimde kaydedildiğini doğrulamak için hazırlanmıştır.',
+                'featured_image' => $image,
+                'status' => Post::STATUS_DRAFT,
+            ]);
+
+        $response->assertSessionHasNoErrors();
+
+        $post = Post::query()
+            ->where('title', 'Görselli Test Yazısı')
+            ->firstOrFail();
+
+        $response->assertRedirect(route('posts.show', $post));
+
+        $this->assertNotNull($post->featured_image);
+        $this->assertStringStartsWith('posts/', $post->featured_image);
+
+        $this->assertDatabaseHas('posts', [
+            'id' => $post->id,
+            'featured_image' => $post->featured_image,
+        ]);
+
+        Storage::disk('public')->assertExists($post->featured_image);
     }
 
     public function test_yayindaki_yazi_olusturulurken_yayin_tarihi_kaydedilir(): void
@@ -414,5 +457,50 @@ class PostControllerTest extends TestCase
                     && $posts->currentPage() === 2;
             })
             ->assertDontSee($unmatchedPost->title);
+    }
+
+    public function test_yazi_guncellenirken_yeni_gorsel_kaydedilir_ve_eski_gorsel_silinir(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create([
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        $oldImagePath = 'posts/eski-kapak.jpg';
+
+        Storage::disk('public')->put($oldImagePath, 'eski görsel');
+
+        $post = Post::factory()->create([
+            'user_id' => $user->id,
+            'featured_image' => $oldImagePath,
+            'status' => Post::STATUS_DRAFT,
+        ]);
+
+        $newImage = UploadedFile::fake()
+            ->image('yeni-kapak.jpg', 1200, 630)
+            ->size(500);
+
+        $response = $this
+            ->actingAs($user)
+            ->put(route('posts.update', $post), [
+                'title' => 'Görseli Güncellenen Yazı',
+                'excerpt' => 'Yeni öne çıkan görsel testi.',
+                'content' => 'Bu içerik, yazı güncellenirken yeni görselin kaydedildiğini ve eski görselin silindiğini doğrulamak için hazırlanmıştır.',
+                'featured_image' => $newImage,
+                'status' => Post::STATUS_DRAFT,
+            ]);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect(route('posts.show', $post));
+
+        $post->refresh();
+
+        $this->assertNotNull($post->featured_image);
+        $this->assertNotSame($oldImagePath, $post->featured_image);
+        $this->assertStringStartsWith('posts/', $post->featured_image);
+
+        Storage::disk('public')->assertExists($post->featured_image);
+        Storage::disk('public')->assertMissing($oldImagePath);
     }
 }

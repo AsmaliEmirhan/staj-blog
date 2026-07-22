@@ -56,17 +56,19 @@
     <div class="field-error">{{ $message }}</div>
 @enderror
 
-<label for="featured_image">Öne çıkan görsel adresi</label>
+<label for="featured_image">Öne çıkan görsel</label>
 <input
     id="featured_image"
     name="featured_image"
-    type="text"
-    value="{{ old('featured_image', $post->featured_image ?? '') }}"
+    type="file"
+    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
 >
+
+<p>JPG, JPEG, PNG veya WebP biçiminde bir görsel seçiniz.</p>
+
 @error('featured_image')
     <div class="field-error">{{ $message }}</div>
 @enderror
-
 <label for="status">Yazı durumu</label>
 <select id="status" name="status" required>
     <option

@@ -3,14 +3,26 @@
 @section('title', $tag->name . ' Etiketli Yazılar')
 
 @section('content')
-    <h1>{{ $tag->name }} etiketli yazılar</h1>
+    <header>
+        <h1>{{ $tag->name }} etiketli yazılar</h1>
 
-    <p>
-        <a href="{{ route('posts.index') }}">Tüm yazılara dön</a>
-    </p>
+        <p>
+            <a href="{{ route('posts.index') }}">Tüm yazılara dön</a>
+        </p>
+    </header>
 
     @forelse ($posts as $post)
         <article class="post">
+            @if ($post->featured_image)
+                <a href="{{ route('posts.show', $post) }}">
+                    <img
+                        src="{{ asset('storage/' . $post->featured_image) }}"
+                        alt="{{ $post->title }}"
+                        loading="lazy"
+                    >
+                </a>
+            @endif
+
             <h2>
                 <a href="{{ route('posts.show', $post) }}">
                     {{ $post->title }}
@@ -27,20 +39,28 @@
                     </a>
                 @endif
 
-                · Yayın: {{ $post->published_at?->format('d.m.Y H:i') }}
+                @if ($post->published_at)
+                    · Yayın: {{ $post->published_at->format('d.m.Y H:i') }}
+                @endif
             </p>
 
             @if ($post->excerpt)
                 <p>{{ $post->excerpt }}</p>
             @else
-                <p>{{ Str::limit(strip_tags($post->content), 180) }}</p>
+                <p>
+                    {{ Str::limit(strip_tags($post->content), 180) }}
+                </p>
             @endif
 
-            <a href="{{ route('posts.show', $post) }}">Devamını oku</a>
+            <a href="{{ route('posts.show', $post) }}">
+                Devamını oku
+            </a>
         </article>
     @empty
         <p>Bu etikete ait yayımlanmış bir blog yazısı bulunmuyor.</p>
     @endforelse
 
-    {{ $posts->links() }}
+    @if ($posts->hasPages())
+        {{ $posts->links() }}
+    @endif
 @endsection

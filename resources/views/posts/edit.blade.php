@@ -5,7 +5,7 @@
 @section('content')
     <h1>Blog yazısını düzenle</h1>
 
-    <form method="POST" action="{{ route('posts.update', $post) }}">
+    <form method="POST" action="{{ route('posts.update', $post) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 

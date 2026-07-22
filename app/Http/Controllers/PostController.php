@@ -13,6 +13,9 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use RuntimeException;
+use Throwable;
 
 class PostController extends Controller
 {
@@ -67,25 +70,52 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request): RedirectResponse
     {
-        $post = DB::transaction(function () use ($request): Post {
-            $validated = $request->validated();
-            $tagIds = $validated['tag_ids'] ?? [];
-            $status = $validated['status'];
+        $validated = $request->validated();
+        $tagIds = $validated['tag_ids'] ?? [];
+        $status = $validated['status'];
+        $featuredImage = $request->file('featured_image');
+        $featuredImagePath = null;
 
-            unset(
-                $validated['tag_ids'],
-                $validated['status']
-            );
+        unset(
+            $validated['tag_ids'],
+            $validated['status'],
+            $validated['featured_image']
+        );
 
-            $post = new Post($validated);
-            $post->user_id = $request->user()->getKey();
-            $post->status = $status;
-            $post->save();
+        if ($featuredImage !== null) {
+            $storedPath = $featuredImage->store('posts', 'public');
 
-            $post->tags()->sync($tagIds);
+            if ($storedPath === false) {
+                throw new RuntimeException('Görsel kaydedilemedi.');
+            }
 
-            return $post;
-        });
+            $featuredImagePath = $storedPath;
+            $validated['featured_image'] = $featuredImagePath;
+        }
+
+        try {
+            $post = DB::transaction(function () use (
+                $request,
+                $validated,
+                $tagIds,
+                $status
+            ): Post {
+                $post = new Post($validated);
+                $post->user_id = $request->user()->getKey();
+                $post->status = $status;
+                $post->save();
+
+                $post->tags()->sync($tagIds);
+
+                return $post;
+            });
+        } catch (Throwable $exception) {
+            if ($featuredImagePath !== null) {
+                Storage::disk('public')->delete($featuredImagePath);
+            }
+
+            throw $exception;
+        }
 
         return redirect()
             ->route('posts.show', $post)
@@ -130,22 +160,59 @@ class PostController extends Controller
         UpdatePostRequest $request,
         Post $post
     ): RedirectResponse {
-        DB::transaction(function () use ($request, $post): void {
-            $validated = $request->validated();
-            $tagIds = $validated['tag_ids'] ?? [];
-            $status = $validated['status'];
+        $validated = $request->validated();
+        $tagIds = $validated['tag_ids'] ?? [];
+        $status = $validated['status'];
+        $featuredImage = $request->file('featured_image');
+        $oldFeaturedImagePath = $post->featured_image;
+        $newFeaturedImagePath = null;
 
-            unset(
-                $validated['tag_ids'],
-                $validated['status']
-            );
+        unset(
+            $validated['tag_ids'],
+            $validated['status'],
+            $validated['featured_image']
+        );
 
-            $post->fill($validated);
-            $post->status = $status;
-            $post->save();
+        if ($featuredImage !== null) {
+            $storedPath = $featuredImage->store('posts', 'public');
 
-            $post->tags()->sync($tagIds);
-        });
+            if ($storedPath === false) {
+                throw new RuntimeException('Görsel kaydedilemedi.');
+            }
+
+            $newFeaturedImagePath = $storedPath;
+            $validated['featured_image'] = $newFeaturedImagePath;
+        }
+
+        try {
+            DB::transaction(function () use (
+                $post,
+                $validated,
+                $tagIds,
+                $status
+            ): void {
+                $post->fill($validated);
+                $post->status = $status;
+                $post->save();
+
+                $post->tags()->sync($tagIds);
+            });
+        } catch (Throwable $exception) {
+            if ($newFeaturedImagePath !== null) {
+                Storage::disk('public')->delete($newFeaturedImagePath);
+            }
+
+            throw $exception;
+        }
+
+        if (
+            $newFeaturedImagePath !== null
+            && is_string($oldFeaturedImagePath)
+            && str_starts_with($oldFeaturedImagePath, 'posts/')
+            && $oldFeaturedImagePath !== $newFeaturedImagePath
+        ) {
+            Storage::disk('public')->delete($oldFeaturedImagePath);
+        }
 
         return redirect()
             ->route('posts.show', $post)
