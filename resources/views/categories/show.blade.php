@@ -3,14 +3,26 @@
 @section('title', $category->name)
 
 @section('content')
-    <h1>{{ $category->name }}</h1>
+    <header>
+        <h1>{{ $category->name }}</h1>
 
-    @if ($category->description)
-        <p>{{ $category->description }}</p>
-    @endif
+        @if ($category->description)
+            <p>{{ $category->description }}</p>
+        @endif
+    </header>
 
     @forelse ($posts as $post)
         <article class="post">
+            @if ($post->featured_image)
+                <a href="{{ route('posts.show', $post) }}">
+                    <img
+                        src="{{ asset('storage/' . $post->featured_image) }}"
+                        alt="{{ $post->title }}"
+                        loading="lazy"
+                    >
+                </a>
+            @endif
+
             <h2>
                 <a href="{{ route('posts.show', $post) }}">
                     {{ $post->title }}
@@ -19,8 +31,10 @@
 
             <p>
                 Yazar: {{ $post->author->name }}
-                · Yayın:
-                {{ $post->published_at?->format('d.m.Y H:i') }}
+
+                @if ($post->published_at)
+                    · Yayın: {{ $post->published_at->format('d.m.Y H:i') }}
+                @endif
             </p>
 
             @if ($post->excerpt)
@@ -32,7 +46,12 @@
             @if ($post->tags->isNotEmpty())
                 <p>
                     Etiketler:
-                    {{ $post->tags->pluck('name')->join(', ') }}
+
+                    @foreach ($post->tags as $tag)
+                        <a href="{{ route('tags.show', $tag) }}">
+                            {{ $tag->name }}
+                        </a>{{ $loop->last ? '' : ',' }}
+                    @endforeach
                 </p>
             @endif
 
@@ -44,7 +63,9 @@
         <p>Bu kategoride henüz yayımlanmış bir yazı bulunmuyor.</p>
     @endforelse
 
-    {{ $posts->links() }}
+    @if ($posts->hasPages())
+        {{ $posts->links() }}
+    @endif
 
     <p>
         <a href="{{ route('posts.index') }}">Tüm yazılara dön</a>
