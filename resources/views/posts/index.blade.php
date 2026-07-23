@@ -20,10 +20,11 @@
         <button type="submit">Ara</button>
 
         @if ($search !== '')
-            <a class="button" href="{{ route('posts.index') }}">Aramayı temizle</a>
+            <a class="button" href="{{ route('posts.index') }}">
+                Aramayı temizle
+            </a>
         @endif
     </form>
-
 
     @auth
         @can('create', App\Models\Post::class)
@@ -37,6 +38,16 @@
 
     @forelse ($posts as $post)
         <article class="post">
+            @if ($post->featured_image)
+                <a href="{{ route('posts.show', $post) }}">
+                    <img
+                        src="{{ asset('storage/' . $post->featured_image) }}"
+                        alt="{{ $post->title }}"
+                        loading="lazy"
+                    >
+                </a>
+            @endif
+
             <h2>
                 <a href="{{ route('posts.show', $post) }}">
                     {{ $post->title }}
@@ -46,15 +57,18 @@
             <p>
                 Yazar: {{ $post->author->name }}
                 · Kategori:
-                    @if ($post->category)
-                        <a href="{{ route('categories.show', $post->category) }}">
-                            {{ $post->category->name }}
-                        </a>
-                    @else
-                        Kategorisiz
-                    @endif
-                · Yayın:
-                {{ $post->published_at?->format('d.m.Y H:i') }}
+
+                @if ($post->category)
+                    <a href="{{ route('categories.show', $post->category) }}">
+                        {{ $post->category->name }}
+                    </a>
+                @else
+                    Kategorisiz
+                @endif
+
+                @if ($post->published_at)
+                    · Yayın: {{ $post->published_at->format('d.m.Y H:i') }}
+                @endif
             </p>
 
             @if ($post->excerpt)
@@ -63,7 +77,7 @@
                 <p>{{ Str::limit(strip_tags($post->content), 180) }}</p>
             @endif
 
-                    @if ($post->tags->isNotEmpty())
+            @if ($post->tags->isNotEmpty())
                 <p>
                     Etiketler:
 
@@ -75,11 +89,15 @@
                 </p>
             @endif
 
-            <a href="{{ route('posts.show', $post) }}">Devamını oku</a>
+            <a href="{{ route('posts.show', $post) }}">
+                Devamını oku
+            </a>
         </article>
     @empty
         <p>Henüz yayınlanmış bir blog yazısı bulunmuyor.</p>
     @endforelse
 
-    {{ $posts->links() }}
+    @if ($posts->hasPages())
+        {{ $posts->links() }}
+    @endif
 @endsection
