@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AiGenerationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PostController;
@@ -84,6 +85,12 @@ Route::middleware('auth')->group(function (): void {
 
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])
         ->name('posts.destroy');
+    Route::post(
+        '/api/ai/generate-post',
+        [AiGenerationController::class, 'generateBlogPost']
+    )
+        ->middleware('throttle:5,1')
+        ->name('api.ai.generate-post');
 });
 
 Route::get('/posts/{post}', [PostController::class, 'show'])
